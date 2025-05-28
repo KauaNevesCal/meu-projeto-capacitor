@@ -4,6 +4,8 @@
 	import Toast from '$lib/components/Toast.svelte';
 	import ToDoList from '$lib/components/ToDoList.svelte';
 	import * as bootstrap from 'bootstrap';
+	import { exists } from 'drizzle-orm';
+	import { flip } from 'svelte/animate';
 
 	let novaTarefa = $state('');
 	let tarefas = $state([]);
@@ -13,6 +15,8 @@
 	let tarefaEditando = $state();
 	let tarefaExcluindo;
 	let mensagemToast;
+	let exibir = $state('2');
+	let busca = $state('');
 
 	async function adicionarTarefa() {
 		novaTarefa = novaTarefa.trim();
@@ -33,9 +37,11 @@
 		if (!conteudoTarefaEditando) {
 			mensagemToast.show();
 			return;
+		} else {
+			tarefaEditando.conteudo = conteudoTarefaEditando;
+			tarefaEditando = null;
+			conteudoTarefaEditando = '';
 		}
-		tarefaEditando.conteudo = conteudoTarefaEditando;
-		tarefaEditando = undefined;
 	}
 
 	function cancelarEdicao() {
@@ -47,17 +53,35 @@
 	}
 
 	function confirmarExclusao() {
-		tarefas = tarefas.filter((tarefa) => tarefa !== tarefaExcluindo);
-    tarefaExcluindo = undefined;
+		if (tarefaExcluindo) {
+			tarefas = tarefas.filter((tarefa) => tarefa !== tarefaExcluindo);
+			tarefaExcluindo = undefined;
+		}
 	}
 
 	function alterarStatus(tarefa, status) {
-    tarefa.status = status;
-  }
+		tarefa.status = status;
+	}
+
+	function alltasksdone() {
+		tarefas.forEach((tarefa) => {
+			tarefa.status = 1;
+		});
+	}
+
+	function alltasksundone() {
+		tarefas.forEach((tarefa) => {
+			tarefa.status = 0;
+		});
+	}
 
 	onMount(() => {
 		mensagemToast = new bootstrap.Toast('#mensagemToast');
 	});
+
+	function buscarTarefas() {
+		return tarefas.filter((tarefa) => tarefa.conteudo.toLowerCase().includes(busca.toLowerCase()));
+	}
 </script>
 
 <div class="fixed-top pt-5" style="z-index: 1020;">
@@ -70,28 +94,93 @@
 	<Toast msg={'Digite algo!'} />
 </div>
 
-<div class="container-fluid mt-5 pt-3">
-	<ToDoList
-		tarefas={tarefasPendentes}
-		{tarefaEditando}
-		bind:conteudoTarefaEditando
-		{editarTarefa}
-		{confirmarEdicao}
-		{cancelarEdicao}
-		{alterarStatus}
-		{excluirTarefa}
-	/>
-	<hr />
-	<ToDoList
-		tarefas={tarefasConcluidas}
-		{tarefaEditando}
-		bind:conteudoTarefaEditando
-		{editarTarefa}
-		{confirmarEdicao}
-		{cancelarEdicao}
-		{alterarStatus}
-		{excluirTarefa}
-	/>
-</div>
+<form>
+	<div class="container-fluid mt-5 pt-4">
+		<br />
+		<div class="dropdown">
+			<button
+				class="btn btn-secondary"
+				type="button"
+				data-bs-toggle="dropdown"
+				aria-expanded="false"
+				style="width: 100%; background-color:crimson;"
+			>
+				Opções
+			</button>
+			<ul
+				class="dropdown-menu"
+				style="width: 100%; text-align: center; background-color:lightgray; font-weight:bolder;"
+			>
+				Tarefas sendo exibidas:
+				<select style="border-radius: 8px; font-weight:500;" name="exibir" id="pet-select" bind:value={exibir}>
+					<option value="0">Pendentes</option>
+					<option value="1">Concluídas</option>
+					<option value="2">Todas</option>
+				</select>
+				<br />
+				<button
+					type="button"
+					onclick={alltasksdone}
+					style="background-color:green; color:white; font-size:small; margin-top: 5px; border-radius: 8px; font-weight:500;"
+					>Marcar todas como concluidas</button
+				>
+				<button
+					type="button"
+					onclick={alltasksundone}
+					style="background-color:orange; color:white; font-size:small; margin-top: 5px; border-radius: 8px; font-weight:500;"
+					>Marcar todas como pendentes</button
+				>
+				<br />
+				<input
+					class="form-control form-control-lg"
+					style="width: 98%; margin: 0 auto; margin-top:5px;"
+					placeholder="Pesquisar..."
+					bind:value={busca}
+				/>
+			</ul>
+		</div>
+		<center>
+			<span class="badge text-bg-secondary">Totais: {tarefas.length}</span>
+			<span class="badge text-bg-warning">Pendentes: {tarefasPendentes.length}</span>
+			<span class="badge text-bg-success">Concluídas: {tarefasConcluidas.length}</span>
+		</center>
+		<br />
 
-<Modal msg={'Deseja excluir a tarefa?'} acao={confirmarExclusao} />
+		{#if exibir == '0'}
+			<ToDoList
+				tarefas={buscarTarefas().filter((tarefa) => tarefa.status == 0)}
+				{tarefaEditando}
+				bind:conteudoTarefaEditando
+				{editarTarefa}
+				{confirmarEdicao}
+				{cancelarEdicao}
+				{alterarStatus}
+				{excluirTarefa}
+			/>
+		{:else if exibir == '1'}
+			<ToDoList
+				tarefas={buscarTarefas().filter((tarefa) => tarefa.status == 1)}
+				{tarefaEditando}
+				bind:conteudoTarefaEditando
+				{editarTarefa}
+				{confirmarEdicao}
+				{cancelarEdicao}
+				{alterarStatus}
+				{excluirTarefa}
+			/>
+		{:else if exibir == '2'}
+			<ToDoList
+				tarefas={buscarTarefas()}
+				{tarefaEditando}
+				bind:conteudoTarefaEditando
+				{editarTarefa}
+				{confirmarEdicao}
+				{cancelarEdicao}
+				{alterarStatus}
+				{excluirTarefa}
+			/>
+		{/if}
+	</div>
+
+	<Modal msg={'Deseja excluir a tarefa?'} acao={confirmarExclusao} />
+</form>
