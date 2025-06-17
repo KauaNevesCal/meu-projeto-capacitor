@@ -35,12 +35,12 @@
   </section>
   
   <section>
-    <input bind:value={termo} placeholder="Digite uma palavra..." />
+    <input bind:value={termo} placeholder="Digitar..." />
     <button on:click={buscar}>Buscar</button>
   
     <br><br>
   
-    <input bind:value={filtro} placeholder="Filtro por prefixo (ex: ab)" on:input={aplicarFiltro} />
+    <input bind:value={filtro} placeholder="Filtrar..." on:input={aplicarFiltro} />
   </section>
   
   <section>

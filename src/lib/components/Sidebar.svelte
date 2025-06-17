@@ -8,6 +8,7 @@
         <li class="nav-item"><a class="nav-link active" href="/appconversoru">Conversor de Unidades</a></li>
         <li class="nav-item"><a class="nav-link active" href="/calculadora">Calculadora</a></li>
         <li class="nav-item"><a class="nav-link active" href="/todolist">To Do list</a></li>
+        <li class="nav-item"><a class="nav-link active" href="/dicionario">Dicionário</a></li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="/" role="button" data-bs-toggle="dropdown">Dropdown</a>
           <ul class="dropdown-menu">

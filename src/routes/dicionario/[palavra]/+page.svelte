@@ -15,7 +15,18 @@
       goto(`/dicionario/${termo}`);
     }
   }
+
+  function voltar() {
+    if (history.length > 1) {
+      history.back();
+    } else {
+      goto('/dicionario');
+    }
+  }
+
 </script>
+
+<button on:click={voltar} style="margin-top: 1rem;">← Voltar</button>
 
 <h1>{data.termo}</h1>
 
