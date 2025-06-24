@@ -1,6 +1,4 @@
 <script>
-	import { backOut } from "svelte/easing";
-
 
     let display=$state('');
 
