@@ -17,11 +17,23 @@
 			cor = 'black';
 		}
 	}
+
+	function voltar() {
+		if (history.length > 1) {
+			history.back();
+		} else {
+			goto('/bet');
+		}
+	}
+
 </script>
 
+<button on:click={voltar} style="margin-top: 1rem; border-radius: 4px;">← Voltar</button>
+
+
 <div style="text-align: center; margin-top: 50px;">
-	<h1>🎰 Roleta da Sorte</h1>
-	<button on:click={girarRoleta} style="padding: 10px 20px; font-size: 18px; cursor: pointer;">
+	<h1>🎰Roleta da Sorte🎰</h1>
+	<button on:click={girarRoleta} style="padding: 10px 20px; font-size: 18px; cursor: pointer; border-radius: 4px;">
 		Girar Roleta
 	</button>
 
